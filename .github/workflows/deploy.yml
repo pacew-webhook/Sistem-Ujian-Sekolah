@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+
   workflow_dispatch:
 
 permissions:
@@ -11,6 +12,7 @@ permissions:
 
 jobs:
   deploy:
+    name: Deploy to Google Apps Script
     runs-on: ubuntu-latest
 
     steps:
@@ -32,11 +34,31 @@ jobs:
           printf '%s' "$CLASP_CREDENTIALS" > "$HOME/.clasprc.json"
           chmod 600 "$HOME/.clasprc.json"
 
-      - name: Show clasp version
-        run: clasp -v
-
-      - name: Show project status
+      - name: Check clasp
         run: clasp status
 
-      - name: Push project
+      - name: Push source code
         run: clasp push --force
+
+      - name: Create new Apps Script version
+        id: version
+        run: |
+          VERSION=$(clasp version "GitHub commit $GITHUB_SHA" | tail -1 | grep -oE '[0-9]+$')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Update Web App deployment
+        env:
+          DEPLOYMENT_ID: ${{ secrets.DEPLOYMENT_ID }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          clasp deploy \
+            --deploymentId "$DEPLOYMENT_ID" \
+            --versionNumber "$VERSION"
+
+      - name: Deployment completed
+        run: |
+          echo "======================================"
+          echo "Google Apps Script deployment berhasil"
+          echo "Commit: $GITHUB_SHA"
+          echo "Version: ${{ steps.version.outputs.version }}"
+          echo "======================================"
