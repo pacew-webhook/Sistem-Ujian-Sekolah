@@ -167,3 +167,25 @@ Sebelum digunakan untuk ujian resmi, pertimbangkan menambahkan:
 ## 📌 Lisensi
 
 Silakan sesuaikan lisensi repository sesuai kebutuhan sekolah atau project Anda.
+
+# Project Ujian
+
+Google Apps Script project yang disinkronkan dengan GitHub menggunakan clasp.
+
+## Automatic Deployment
+
+Setiap push ke branch `main` akan menjalankan:
+
+1. GitHub Actions
+2. Install clasp
+3. Login menggunakan CLASP_CREDENTIALS
+4. clasp push
+5. Update Google Apps Script
+
+## Struktur
+
+- Code.gs
+- appsscript.json
+- .clasp.json
+- .claspignore
+- .github/workflows/deploy.yml
