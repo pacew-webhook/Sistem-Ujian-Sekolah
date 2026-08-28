@@ -1,0 +1,14 @@
+{
+  "name": "project-ujian",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Project Ujian Google Apps Script",
+  "scripts": {
+    "deploy": "clasp push --force",
+    "pull": "clasp pull",
+    "status": "clasp status"
+  },
+  "devDependencies": {
+    "@google/clasp": "^3.4.0"
+  }
+}
