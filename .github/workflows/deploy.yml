@@ -11,7 +11,6 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy to Google Apps Script
     runs-on: ubuntu-latest
 
     steps:
@@ -33,11 +32,11 @@ jobs:
           printf '%s' "$CLASP_CREDENTIALS" > "$HOME/.clasprc.json"
           chmod 600 "$HOME/.clasprc.json"
 
-      - name: Check clasp connection
+      - name: Show clasp version
+        run: clasp -v
+
+      - name: Show project status
         run: clasp status
 
-      - name: Push to Google Apps Script
+      - name: Push project
         run: clasp push --force
-
-      - name: Deployment completed
-        run: echo "Deploy Google Apps Script berhasil."
