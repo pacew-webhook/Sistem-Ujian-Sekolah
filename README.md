@@ -1,23 +1,169 @@
-# Sistem Ujian Sekolah — Google Sheets + Gmail
+# 🎓 Sistem Ujian Sekolah
 
-## Isi
-- `Sistem_Ujian_Sekolah_Template.xlsx` — template database.
-- `Code.gs` — Google Apps Script untuk menu dan pengiriman email massal.
+Sistem ujian sekolah berbasis **Google Apps Script + Google Sheets** dengan API yang dapat digunakan oleh aplikasi Android.
 
-## Cara memasang
-1. Upload XLSX ke Google Drive lalu buka dengan Google Sheets.
-2. Buka **Extensions → Apps Script**.
-3. Hapus kode bawaan dan paste isi `Code.gs`.
-4. Simpan.
-5. Kembali ke Spreadsheet dan reload.
-6. Menu **🎓 UJIAN SEKOLAH** akan muncul.
-7. Isi data siswa, ujian, dan bank soal.
-8. Pastikan status peserta `BELUM` dan ujian `AKTIF`.
-9. Pilih **🎓 UJIAN SEKOLAH → 📧 Kirim Ujian**.
-10. Pilih kelas dan ujian, lalu klik **KIRIM**.
+## 📁 Struktur Project
 
-## Catatan
-- Contoh email memakai alamat dummy `example.com`; ganti dengan email siswa sebenarnya.
-- Script hanya mengirim peserta dengan status `BELUM`, kelas sesuai pilihan, dan ID ujian sesuai pilihan.
-- Setelah berhasil, status menjadi `TERKIRIM`.
-- Batas pengiriman email Google tetap berlaku sesuai jenis akun.
+```text
+Sistem-Ujian-Sekolah/
+├── src/
+│   └── Code.gs
+├── appsscript.json
+├── .gitignore
+├── .clasp.json.example
+├── Template_Sistem_Ujian_Sekolah.xlsx
+└── README.md
+```
+
+## ✨ Fitur
+
+- API cek kode peserta
+- API mengambil soal tanpa mengirim kunci jawaban
+- API status ujian
+- POST jawaban peserta
+- Perhitungan nilai otomatis
+- Pencegahan submit bersamaan menggunakan `LockService`
+- Dashboard guru untuk mengirim kode ujian melalui email
+- Konfigurasi Spreadsheet menggunakan Script Properties
+
+## 📊 Sheet yang wajib ada
+
+Jangan mengubah nama sheet berikut:
+
+- `Peserta`
+- `Ujian`
+- `BankSoal`
+- `Jawaban`
+- `Nilai`
+- `Pengaturan`
+
+## 🚀 Instalasi Google Sheets
+
+1. Upload `Template_Sistem_Ujian_Sekolah.xlsx` ke Google Drive.
+2. Buka dengan Google Sheets.
+3. Pastikan semua nama sheet tetap sama.
+4. Isi data peserta, ujian, dan bank soal.
+
+## 🔐 Konfigurasi SPREADSHEET_ID
+
+Project ini **tidak menyimpan Spreadsheet ID di GitHub**.
+
+Di Google Apps Script:
+
+**Project Settings → Script Properties → Add script property**
+
+Tambahkan:
+
+```text
+Property: SPREADSHEET_ID
+Value: ID Google Spreadsheet Anda
+```
+
+Contoh URL spreadsheet:
+
+```text
+https://docs.google.com/spreadsheets/d/ABC123XYZ/edit
+```
+
+Maka value yang digunakan adalah:
+
+```text
+ABC123XYZ
+```
+
+## 🧩 Instalasi Apps Script Manual
+
+1. Buka Google Apps Script.
+2. Buat project baru.
+3. Copy isi `src/Code.gs` ke file `Code.gs`.
+4. Tambahkan Script Property `SPREADSHEET_ID`.
+5. Simpan project.
+6. Deploy sebagai **Web app**.
+
+## 🔄 Sinkronisasi dengan clasp
+
+### Install Node.js
+
+Install Node.js terlebih dahulu, kemudian:
+
+```bash
+npm install -g @google/clasp
+```
+
+Login:
+
+```bash
+clasp login
+```
+
+Buat file `.clasp.json` dari contoh:
+
+```bash
+cp .clasp.json.example .clasp.json
+```
+
+Isi `scriptId` dengan Script ID project Google Apps Script.
+
+Upload source code:
+
+```bash
+clasp push
+```
+
+Mengambil perubahan dari Apps Script:
+
+```bash
+clasp pull
+```
+
+## 🌐 API
+
+Ganti `WEB_APP_URL` dengan URL deployment Web App.
+
+### Cek peserta
+
+```text
+GET WEB_APP_URL?action=cek&kode=X7K92
+```
+
+### Ambil soal
+
+```text
+GET WEB_APP_URL?action=soal&kode=X7K92
+```
+
+API ini tidak mengirim kolom kunci jawaban.
+
+### Status ujian
+
+```text
+GET WEB_APP_URL?action=status&kode=X7K92
+```
+
+### Kirim jawaban
+
+```json
+{
+  "action": "jawaban",
+  "kode": "X7K92",
+  "jawaban": [
+    {"idSoal": "Q001", "jawaban": "B"},
+    {"idSoal": "Q002", "jawaban": "C"}
+  ]
+}
+```
+
+## ⚠️ Catatan Keamanan
+
+Sebelum digunakan untuk ujian resmi, pertimbangkan menambahkan:
+
+- autentikasi/token API
+- validasi waktu mulai dan selesai ujian
+- batas perangkat atau sesi
+- pengacakan soal yang aman
+- logging aktivitas
+- proteksi terhadap penggunaan kode ujian berulang
+
+## 📌 Lisensi
+
+Silakan sesuaikan lisensi repository sesuai kebutuhan sekolah atau project Anda.

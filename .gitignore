@@ -1,0 +1,15 @@
+# clasp
+.clasp.json
+
+# Local environment / secrets
+.env
+.env.*
+*.local.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
