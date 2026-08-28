@@ -1,12 +1,11 @@
 {
-  "name": "project-ujian",
+  "name": "sistem-ujian-sekolah",
   "version": "1.0.0",
   "private": true,
-  "description": "Project Ujian Google Apps Script",
   "scripts": {
-    "deploy": "clasp push --force",
-    "pull": "clasp pull",
-    "status": "clasp status"
+    "clasp:status": "clasp status",
+    "clasp:push": "clasp push --force",
+    "clasp:version": "clasp version"
   },
   "devDependencies": {
     "@google/clasp": "^3.4.0"
