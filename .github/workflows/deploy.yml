@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy to Google Apps Script
+    name: Deploy Sistem Ujian Sekolah
     runs-on: ubuntu-latest
 
     steps:
@@ -23,9 +23,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
 
-      - name: Install clasp
-        run: npm install -g @google/clasp
+      - name: Install dependencies
+        run: npm install
 
       - name: Configure clasp credentials
         env:
@@ -34,31 +35,54 @@ jobs:
           printf '%s' "$CLASP_CREDENTIALS" > "$HOME/.clasprc.json"
           chmod 600 "$HOME/.clasprc.json"
 
-      - name: Check clasp
-        run: clasp status
+      - name: Check project
+        run: |
+          echo "=== CLASP STATUS ==="
+          npx clasp status
 
       - name: Push source code
-        run: clasp push --force
+        run: |
+          echo "=== PUSH TO APPS SCRIPT ==="
+          npx clasp push --force
 
-      - name: Create new Apps Script version
+      - name: Create Apps Script version
         id: version
         run: |
-          VERSION=$(clasp version "GitHub commit $GITHUB_SHA" | tail -1 | grep -oE '[0-9]+$')
+          OUTPUT="$(npx clasp version "GitHub $GITHUB_SHA")"
+          echo "$OUTPUT"
+
+          VERSION="$(echo "$OUTPUT" | grep -oE '[0-9]+$' | tail -1)"
+
+          if [ -z "$VERSION" ]; then
+            echo "Gagal mendapatkan nomor versi."
+            exit 1
+          fi
+
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Apps Script version: $VERSION"
 
       - name: Update Web App deployment
         env:
           DEPLOYMENT_ID: ${{ secrets.DEPLOYMENT_ID }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          clasp deploy \
+          echo "=== UPDATE WEB APP ==="
+          echo "Deployment ID: configured"
+          echo "Version: $VERSION"
+
+          npx clasp deploy \
             --deploymentId "$DEPLOYMENT_ID" \
             --versionNumber "$VERSION"
 
-      - name: Deployment completed
+      - name: Deployment summary
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          echo "======================================"
-          echo "Google Apps Script deployment berhasil"
-          echo "Commit: $GITHUB_SHA"
-          echo "Version: ${{ steps.version.outputs.version }}"
-          echo "======================================"
+          echo "========================================"
+          echo "  DEPLOYMENT BERHASIL"
+          echo "========================================"
+          echo "Project : Sistem Ujian Sekolah"
+          echo "Commit  : $GITHUB_SHA"
+          echo "Version : $VERSION"
+          echo "Web App : Deployment diperbarui"
+          echo "========================================"
